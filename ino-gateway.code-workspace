@@ -4,5 +4,22 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"makefile.extensionOutputFolder": "./.vscode"
+	},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+			{
+				"name": "Run project",
+				"type": "go",
+				"request": "launch",
+				"mode": "auto",
+				"program": "${workspaceFolder}/main.go",
+				"env": {
+					"GORUNEVN": "dev"
+				},
+			}
+		]
+	}
 }
