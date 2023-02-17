@@ -23,7 +23,9 @@ var (
 )
 
 // map[serviceName]map[version]*ServiceInfo
+// 运行在 redis 初始化之后
 type ServiceManager struct {
+	m            sync.RWMutex
 	ServiceSlice map[string]map[string]*model.ServiceInfo
 }
 
@@ -79,6 +81,8 @@ func (sm *ServiceManager) HTTPAccessMode(c *gin.Context) (*model.ServiceInfo, er
 
 // 新增一个服务
 func (sm *ServiceManager) AppendService(service *model.ServiceInfo) error {
+	sm.m.Lock()
+	defer sm.m.Unlock()
 	if svc, ok := sm.ServiceSlice[service.ServiceKey]; ok {
 		if ver, ok := svc[service.Version]; ok {
 			// 已存在当前版本，直接新增服务host节点
@@ -99,6 +103,8 @@ func (sm *ServiceManager) AppendService(service *model.ServiceInfo) error {
 
 // 删除一个服务
 func (sm *ServiceManager) DelService(service *model.ServiceInfo) error {
+	sm.m.Lock()
+	defer sm.m.Unlock()
 	if _, ok := sm.ServiceSlice[service.ServiceKey]; ok {
 		delete(sm.ServiceSlice[service.ServiceKey], service.Version)
 		changeRedisServiceList(false, service)
