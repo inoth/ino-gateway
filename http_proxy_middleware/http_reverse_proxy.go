@@ -59,6 +59,5 @@ func newProxy(targetHost string) (*httputil.ReverseProxy, error) {
 }
 
 func modifyRequest(req *http.Request) {
-	req.Header.Set("X-Proxy", "Simple-Reverse-Proxy")
-	req.Header.Set("X-Real-IP", req.Header.Get("X-Real-IP"))
+	req.Header.Set("X-Proxy", "Cmdb-Reverse-Proxy")
 }

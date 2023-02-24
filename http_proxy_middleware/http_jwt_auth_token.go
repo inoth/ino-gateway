@@ -11,6 +11,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+/*
+	获取客户端 jwt 信息，解析
+*/
+
 func HTTPJwtAuthTokenMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		service, ok := c.Get("service")
@@ -20,6 +24,7 @@ func HTTPJwtAuthTokenMiddleware() gin.HandlerFunc {
 			return
 		}
 		serviceInfo := service.(*model.ServiceInfo)
+		// 该服务是否需要登录信息
 		if serviceInfo.NeedAuth {
 			token := strings.ReplaceAll(c.GetHeader("Authorization"), "Bearer ", "")
 			if len(token) <= 0 {

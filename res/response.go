@@ -40,7 +40,7 @@ func ResultErr(c *gin.Context, code int, err error) {
 func ResultOk(c *gin.Context, code int, data interface{}) {
 	traceId, _ := c.Get("trace_id")
 	resp := &Result{ErrorCode: code, ErrorMsg: "ok", Data: data, TraceId: traceId}
+	c.Set("result", string(resp.String()))
 
 	c.JSON(200, resp)
-	c.Set("result", string(resp.String()))
 }

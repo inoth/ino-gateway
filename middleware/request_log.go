@@ -2,9 +2,10 @@ package middleware
 
 import (
 	"bytes"
+	"fmt"
+	"github/inoth/ino-gateway/components/logger"
 	"github/inoth/ino-gateway/util"
 	"io"
-	"log"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -27,13 +28,13 @@ func RequestInLog(c *gin.Context) {
 		"body":     string(bodyBytes),
 		"from":     c.ClientIP(),
 	}
-	log.Fatalln(req)
+	logger.Zap.Info(fmt.Sprintf("%+v", req))
 }
 
 func RequestOutLog(c *gin.Context) {
 	endExecTime := time.Now()
 	traceId, _ := c.Get("trace_id")
-	response, _ := c.Get("response")
+	response, _ := c.Get("result")
 	st, _ := c.Get("startExecTime")
 	startExecTime, _ := st.(time.Time)
 	resp := map[string]interface{}{
@@ -45,7 +46,7 @@ func RequestOutLog(c *gin.Context) {
 		"response":  response,
 		"proc_time": endExecTime.Sub(startExecTime).Seconds(),
 	}
-	log.Fatalln(resp)
+	logger.Zap.Info(fmt.Sprintf("%+v", resp))
 }
 
 func RequestLog() gin.HandlerFunc {

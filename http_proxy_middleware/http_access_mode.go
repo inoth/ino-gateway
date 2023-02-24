@@ -7,6 +7,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+/*
+	获取服务对应注册信息
+*/
+
 // 根据路由约定获取 /[service]/[version]
 func HTTPAccessModeMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
