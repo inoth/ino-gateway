@@ -114,16 +114,55 @@ func (sm *ServiceManager) AppendService(services ...*model.ServiceInfo) error {
 }
 
 // 删除一个服务
-func (sm *ServiceManager) DelService(service *model.ServiceInfo) error {
+func (sm *ServiceManager) DelService(serviceKey, version string, nodes ...model.ServerNode) error {
 	sm.locker.Lock()
 	defer sm.locker.Unlock()
-	if _, ok := sm.ServiceSlice[service.ServiceKey]; ok {
-		delete(sm.ServiceSlice[service.ServiceKey], service.Version)
-		changeRedisServiceList(false, service)
-		return nil
+	if _, ok := sm.ServiceSlice[serviceKey]; ok {
+		return sm.DelServiceNodes(serviceKey, version, nodes...)
 	}
 	//TODO: 进行日志记录优化
 	fmt.Println("invalid delete, no deleteable object found.")
+	return nil
+}
+
+// 删除服务下节点
+func (sm *ServiceManager) DelServiceNodes(serviceKey, version string, nodes ...model.ServerNode) error {
+	var service *model.ServiceInfo
+	var ok bool
+	if service, ok = sm.ServiceSlice[serviceKey][version]; !ok {
+		return errors.New("invalid delete, no deleteable object found")
+	}
+	// 获取原有nodes列表
+	old := make([]string, 0, len(sm.ServiceSlice[serviceKey][version].Hosts))
+	for _, host := range sm.ServiceSlice[serviceKey][version].Hosts {
+		old = append(old, host.Host)
+	}
+
+	// 长度相等，直接全部删除，无需校验差集
+	if len(old) == len(nodes) {
+		delete(sm.ServiceSlice[serviceKey], version)
+	} else {
+		// 获取差集之后，修改内存中存活 node
+		dels := make([]string, 0, len(nodes))
+		for _, node := range nodes {
+			dels = append(dels, node.Host)
+		}
+		// 保留部分
+		reserve := util.Difference(old, dels)
+		reserveNode := make([]model.ServerNode, 0, len(reserve))
+		for _, host := range reserve {
+			reserveNode = append(reserveNode, model.ServerNode{
+				Host: host,
+			})
+		}
+		sm.ServiceSlice[serviceKey][version].Hosts = reserveNode
+	}
+
+	for _, node := range nodes {
+		tmp := service.Copy()
+		tmp.AddNode(node)
+		changeRedisServiceList(false, tmp)
+	}
 	return nil
 }
 

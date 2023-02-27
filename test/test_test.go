@@ -61,16 +61,35 @@ func TestAddHttpProxy(t *testing.T) {
 	// 		fmt.Printf("%+v\n", val.Hosts)
 	// 	}
 	// }
-	fmt.Printf("%+v", servicemanage.ServiceManage.GetServiceList())
+	fmt.Printf("\n%+v\n", servicemanage.ServiceManage.GetServiceList())
+	t.Log("ok")
+}
+
+func TestRemoveHttpProxy(t *testing.T) {
+	var (
+		serviceKey = "job"
+		version    = "v1"
+		nodes      = []model.ServerNode{{Host: "http://localhost:8081"}}
+	)
+	initComponents()
+
+	err := servicemanage.ServiceManage.DelService(serviceKey, version, nodes...)
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+	fmt.Printf("\n%+v\n", servicemanage.ServiceManage.GetServiceList())
 	t.Log("ok")
 }
 
 func TestUtilIntersect(t *testing.T) {
+	type TTTTT struct {
+		Host string
+	}
 	var (
-		new = []string{"http://localhost:8081", "http://localhost:8083"}
+		new = []string{"http://localhost:8082", "http://localhost:8081"}
 		old = []string{"http://localhost:8082", "http://localhost:8085", "http://localhost:8081"}
 	)
 
 	fmt.Println(util.Intersect(new, old))
-	fmt.Println(util.Difference(new, old))
+	fmt.Println(util.Difference(old, new))
 }

@@ -12,7 +12,7 @@ proxy:
   http:
     read_timeout: 10
     write_timeout: 10
-    max_header_bytes: 1024
+    max_header_bytes: 20
 
 
 Redis:

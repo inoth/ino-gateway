@@ -30,11 +30,12 @@ func main() {
 		&cache.RedisComponent{},
 		&servicemanage.ServiceManager{},
 	).Init().SubStart(
-		&proxyconfserver.HttpTestProxyServer{},  // 服务A
-		&proxyconfserver.HttpTestAProxyServer{}, // 服务B
+		// &proxyconfserver.HttpTestProxyServer{},  // 服务A
+		// &proxyconfserver.HttpTestAProxyServer{}, // 服务B
+		&proxyconfserver.HttpProxyServer{},
 		&httpproxyserver.HttpProxyServer{
 			Middlewares: []gin.HandlerFunc{
-				middleware.RecoveryMiddleware(),
+				middleware.Recovery(),
 				middleware.RequestLog(),
 			}}, // 代理
 	)

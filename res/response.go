@@ -8,12 +8,13 @@ import (
 
 // 自定义错误码
 const (
-	SuccessCode int = 100 * iota
-	UndefErrorCode
-	ValidErrorCode
-	InternalErrorCode
+	SuccessCode       int = 100 * iota // 成功返回
+	UndefErrorCode                     // 未定义错误
+	ValidErrorCode                     // 自定义错误
+	InternalErrorCode                  // 内部错误
+	ParamErrorCode                     // 参数错误
 
-	InvalidRequestErrorCode = 401
+	InvalidRequestErrorCode = 401 // 无效请求
 )
 
 type Result struct {
@@ -37,9 +38,13 @@ func ResultErr(c *gin.Context, code int, err error) {
 	c.AbortWithError(200, err)
 }
 
-func ResultOk(c *gin.Context, code int, data interface{}) {
+func ResultOk(c *gin.Context, code int, data ...interface{}) {
 	traceId, _ := c.Get("trace_id")
-	resp := &Result{ErrorCode: code, ErrorMsg: "ok", Data: data, TraceId: traceId}
+	var res interface{}
+	if len(data) > 0 {
+		res = data[0]
+	}
+	resp := &Result{ErrorCode: code, ErrorMsg: "ok", Data: res, TraceId: traceId}
 	c.Set("result", string(resp.String()))
 
 	c.JSON(200, resp)

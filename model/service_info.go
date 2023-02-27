@@ -8,17 +8,17 @@ import (
 
 // redis 存储服务基本信息
 type ServiceInfo struct {
-	ServiceKey  string
-	Version     string
-	Desc        string
-	Hosts       []ServerNode
-	NeedAuth    bool
-	NeedLicense bool // default: false
+	ServiceKey  string       `json:"server_key"`
+	Version     string       `json:"version"`
+	Desc        string       `json:"desc"`
+	Hosts       []ServerNode `json:"hosts"`
+	NeedAuth    bool         `json:"need_auth"`
+	NeedLicense bool         `json:"need_lic"` // default: false
 }
 
 type ServerNode struct {
 	// Weights int
-	Host string
+	Host string `json:"host"`
 }
 
 func (si ServiceInfo) String() []byte {
@@ -31,7 +31,13 @@ func (si *ServiceInfo) GetHost() string {
 }
 
 func (si *ServiceInfo) AddNode(node ...ServerNode) bool {
-	old := make([]string, 0, len(si.Hosts))
+	n := len(si.Hosts)
+	if n <= 0 {
+		si.Hosts = append(si.Hosts, node...)
+		return true
+	}
+
+	old := make([]string, 0, n)
 	new := make([]string, 0, len(node))
 
 	for _, v1 := range si.Hosts {
@@ -48,4 +54,15 @@ func (si *ServiceInfo) AddNode(node ...ServerNode) bool {
 		})
 	}
 	return true
+}
+
+func (si *ServiceInfo) Copy() *ServiceInfo {
+	r := &ServiceInfo{
+		ServiceKey:  si.ServiceKey,
+		Version:     si.Version,
+		Desc:        si.Desc,
+		NeedAuth:    si.NeedAuth,
+		NeedLicense: si.NeedLicense,
+	}
+	return r
 }
