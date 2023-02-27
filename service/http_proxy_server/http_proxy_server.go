@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github/inoth/ino-gateway/components/config"
 	"github/inoth/ino-gateway/components/logger"
 	httpproxymiddleware "github/inoth/ino-gateway/http_proxy_middleware"
 )
@@ -35,8 +36,11 @@ func (hps *HttpProxyServer) Start() error {
 	)
 
 	httpSrvHandler = &http.Server{
-		Addr:    ":80",
-		Handler: r,
+		Addr:           ":80",
+		Handler:        r,
+		ReadTimeout:    time.Duration(config.Cfg.GetInt("proxy.http.read_timeout")) * time.Second,
+		WriteTimeout:   time.Duration(config.Cfg.GetInt("proxy.http.write_timeout")) * time.Second,
+		MaxHeaderBytes: 1 << uint(config.Cfg.GetInt("proxy.http.max_header_bytes")),
 	}
 
 	if err := httpSrvHandler.ListenAndServe(); err != nil && err != http.ErrServerClosed {

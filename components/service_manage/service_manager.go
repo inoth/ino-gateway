@@ -2,12 +2,13 @@ package servicemanage
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github/inoth/ino-gateway/model"
+	"github/inoth/ino-gateway/util"
 	"strings"
 	"sync"
+	"time"
 
 	redis "github/inoth/ino-gateway/components/cache"
 
@@ -26,29 +27,23 @@ var (
 // map[serviceName]map[version]*ServiceInfo
 // 运行在 redis 初始化之后
 type ServiceManager struct {
-	m            sync.RWMutex
+	locker       sync.RWMutex
 	ServiceSlice map[string]map[string]*model.ServiceInfo
 }
 
 func (sm *ServiceManager) Init() (err error) {
 	manageOnce.Do(func() {
-		// sm := &ServiceManager{
-		// 	// m:            sync.RWMutex{},
-		// 	ServiceSlice: make(map[string]map[string]*model.ServiceInfo),
-		// }
-		// sm.m = sync.RWMutex{}
 		sm.ServiceSlice = make(map[string]map[string]*model.ServiceInfo)
 
 		var serviceStr []string
 		if serviceStr, err = redis.Rdc.SMembers(context.Background(), ServiceListCacheKey).Result(); err != nil {
-			fmt.Printf("no available service found\n")
+			fmt.Printf("no available service cache found\n")
 		}
 
 		serviceList := make([]*model.ServiceInfo, 0, len(serviceStr))
 		for i := 0; i < len(serviceStr); i++ {
 			var tmp model.ServiceInfo
-			err = json.Unmarshal([]byte(serviceStr[i]), &tmp)
-			if err != nil {
+			if tmp, err = util.JsonMarshal[model.ServiceInfo](serviceStr[i]); err != nil {
 				continue
 			}
 			fmt.Printf("load service %s:%s, hosts: %+v\n", tmp.ServiceKey, tmp.Version, tmp.Hosts)
@@ -61,7 +56,7 @@ func (sm *ServiceManager) Init() (err error) {
 				sm.ServiceSlice[service.ServiceKey] = make(map[string]*model.ServiceInfo)
 			}
 			if _, ok := sm.ServiceSlice[service.ServiceKey][service.Version]; ok {
-				sm.ServiceSlice[service.ServiceKey][service.Version].Hosts = append(sm.ServiceSlice[service.ServiceKey][service.Version].Hosts, service.Hosts...)
+				sm.ServiceSlice[service.ServiceKey][service.Version].AddNode(service.Hosts...)
 				continue
 			}
 			sm.ServiceSlice[service.ServiceKey][service.Version] = service
@@ -93,21 +88,20 @@ func (sm *ServiceManager) HTTPAccessMode(c *gin.Context) (*model.ServiceInfo, er
 
 // 新增一个服务
 func (sm *ServiceManager) AppendService(services ...*model.ServiceInfo) error {
-	sm.m.Lock()
-	defer sm.m.Unlock()
+	sm.locker.Lock()
+	defer sm.locker.Unlock()
 	for _, service := range services {
-
 		if svc, ok := sm.ServiceSlice[service.ServiceKey]; ok {
 			if ver, ok := svc[service.Version]; ok {
 				// 已存在当前版本，直接新增服务host节点
-				ver.Hosts = append(ver.Hosts, service.Hosts...)
+				ver.AddNode(service.Hosts...)
 				changeRedisServiceList(true, service)
-				return nil
+				continue
 			}
 			// 创建新的服务版本号
 			sm.ServiceSlice[service.ServiceKey][service.Version] = service
 			changeRedisServiceList(true, service)
-			return nil
+			continue
 		}
 		// 创建新的服务
 		if sm.ServiceSlice[service.ServiceKey] == nil {
@@ -121,8 +115,8 @@ func (sm *ServiceManager) AppendService(services ...*model.ServiceInfo) error {
 
 // 删除一个服务
 func (sm *ServiceManager) DelService(service *model.ServiceInfo) error {
-	sm.m.Lock()
-	defer sm.m.Unlock()
+	sm.locker.Lock()
+	defer sm.locker.Unlock()
 	if _, ok := sm.ServiceSlice[service.ServiceKey]; ok {
 		delete(sm.ServiceSlice[service.ServiceKey], service.Version)
 		changeRedisServiceList(false, service)
@@ -133,10 +127,32 @@ func (sm *ServiceManager) DelService(service *model.ServiceInfo) error {
 	return nil
 }
 
+func (sm *ServiceManager) GetServiceList() []model.ServiceInfo {
+	var serviceStr []string
+	var err error
+	if serviceStr, err = redis.Rdc.SMembers(context.Background(), ServiceListCacheKey).Result(); err != nil {
+		return make([]model.ServiceInfo, 0)
+	}
+	serviceList := make([]model.ServiceInfo, 0, len(serviceStr))
+	for i := 0; i < len(serviceStr); i++ {
+		var tmp model.ServiceInfo
+		if tmp, err = util.JsonMarshal[model.ServiceInfo](serviceStr[i]); err != nil {
+			continue
+		}
+		serviceList = append(serviceList, tmp)
+	}
+	return serviceList
+}
+
 func changeRedisServiceList(action bool, service *model.ServiceInfo) {
+	ctx := context.Background()
 	if action {
-		redis.Rdc.SAdd(context.Background(), ServiceListCacheKey, service.String())
+		err := redis.Rdc.SAdd(ctx, ServiceListCacheKey, service.String()).Err()
+		if err != nil {
+			return
+		}
+		redis.Rdc.Expire(ctx, ServiceListCacheKey, time.Hour*72)
 	} else {
-		redis.Rdc.SRem(context.Background(), ServiceListCacheKey, service.String())
+		redis.Rdc.SRem(ctx, ServiceListCacheKey, service.String())
 	}
 }

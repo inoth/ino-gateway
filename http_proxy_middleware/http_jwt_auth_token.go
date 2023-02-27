@@ -28,6 +28,15 @@ func HTTPJwtAuthTokenMiddleware() gin.HandlerFunc {
 		if serviceInfo.NeedAuth {
 			token := strings.ReplaceAll(c.GetHeader("Authorization"), "Bearer ", "")
 			if len(token) <= 0 {
+				var err error
+				token, err = c.Cookie("Authorization")
+				if err != nil {
+					res.ResultErr(c, res.InvalidRequestErrorCode, errors.New("session not found"))
+					c.Abort()
+					return
+				}
+			}
+			if len(token) <= 0 {
 				res.ResultErr(c, res.InvalidRequestErrorCode, errors.New("session not found"))
 				c.Abort()
 				return

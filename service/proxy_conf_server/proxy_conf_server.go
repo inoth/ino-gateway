@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github/inoth/ino-gateway/components/logger"
 	"github/inoth/ino-gateway/res"
+	"github/inoth/ino-gateway/util/auth"
 	"net/http"
 	"time"
 
@@ -27,8 +28,9 @@ func (hps *HttpProxyServer) Start() error {
 
 	proxy := r.Group("/proxy")
 	{
-		proxy.POST("/add", addProxyConfig)
 		proxy.GET("/", queryProxyConfig)
+		proxy.POST("/add", addProxyConfig)
+		proxy.DELETE("/remove", removeProxyConfig)
 	}
 
 	ProxySrvHandler = &http.Server{
@@ -52,8 +54,15 @@ func (hps *HttpProxyServer) Stop() {
 }
 
 func addProxyConfig(c *gin.Context) {
+
 }
+
+func removeProxyConfig(c *gin.Context) {
+
+}
+
 func queryProxyConfig(c *gin.Context) {
+
 }
 
 type HttpTestProxyServer struct {
@@ -67,6 +76,20 @@ func (htps *HttpTestProxyServer) Start() error {
 
 	r.GET("/job/v1", func(ctx *gin.Context) {
 		v := ctx.Query("v")
+		user := map[string]interface{}{
+			"name":   "inoth",
+			"app_id": "123123123",
+		}
+		token, err := auth.CreateToken(user, int64(time.Hour*24))
+		if err != nil {
+			res.ResultErr(ctx, 400, err)
+			return
+		}
+		// ctx.SetCookie("Authorization", token, 0, "", "localhost", true, true)
+		ctx.Header("Authorization", token)
+
+		fmt.Println(ctx.Request.Header.Get("name"))
+		fmt.Println(ctx.Request.Header.Get("app_id"))
 		res.ResultOk(ctx, 200, "this's service a say: ok "+v)
 	})
 

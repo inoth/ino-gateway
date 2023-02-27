@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github/inoth/ino-gateway/model"
 	"github/inoth/ino-gateway/res"
-	"math/rand"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -26,7 +25,7 @@ func HTTPReverseProxyMiddleware() gin.HandlerFunc {
 		}
 		serviceInfo := service.(*model.ServiceInfo)
 
-		proxy, err := newProxy(serviceInfo.Hosts[rand.Intn(len(serviceInfo.Hosts))])
+		proxy, err := newProxy(serviceInfo.GetHost())
 		if err != nil {
 			res.ResultErr(c, http.StatusBadGateway, errors.New("bad gateway"))
 			c.Abort()
