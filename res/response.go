@@ -18,8 +18,8 @@ const (
 )
 
 type Result struct {
-	ErrorCode int         `json:"code"`
-	ErrorMsg  string      `json:"msg"`
+	ErrorCode int         `json:"errno"`
+	ErrorMsg  string      `json:"errmsg"`
 	Data      interface{} `json:"data"`
 	TraceId   interface{} `json:"trace_id"`
 }

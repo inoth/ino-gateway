@@ -36,7 +36,7 @@ func (hps *HttpProxyServer) Start() error {
 	)
 
 	httpSrvHandler = &http.Server{
-		Addr:           ":80",
+		Addr:           config.Cfg.GetString("base.server_port"),
 		Handler:        r,
 		ReadTimeout:    time.Duration(config.Cfg.GetInt("proxy.http.read_timeout")) * time.Second,
 		WriteTimeout:   time.Duration(config.Cfg.GetInt("proxy.http.write_timeout")) * time.Second,
