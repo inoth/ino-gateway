@@ -30,14 +30,12 @@ func main() {
 		&cache.RedisComponent{},
 		&servicemanage.ServiceManager{},
 	).Init().SubStart(
-		// &proxyconfserver.HttpTestProxyServer{},  // 服务A
-		// &proxyconfserver.HttpTestAProxyServer{}, // 服务B
-		&proxyconfserver.HttpProxyServer{},
+		&proxyconfserver.HttpProxyServer{}, // 网关配置接口服务
 		&httpproxyserver.HttpProxyServer{
 			Middlewares: []gin.HandlerFunc{
 				middleware.Recovery(),
 				middleware.RequestLog(),
-			}}, // 代理
+			}}, // 代理服务
 	)
 
 	// 监听退出信号
@@ -45,5 +43,5 @@ func main() {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
-	reg.Stop()
+	reg.Stop() // 关闭注册器内所有服务
 }

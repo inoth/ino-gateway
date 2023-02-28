@@ -1,0 +1,8 @@
+err_log: log/err.log
+warn_log: log/warn.log
+info_log: log/info.log
+maxsize: 100
+maxage: 15
+max_backup: 30
+compress: true
+json: true

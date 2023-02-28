@@ -21,10 +21,11 @@ func initComponents() {
 	os.Setenv("GORUNEVN", "dev")
 	reg = register.NewRegister(
 		&local.CacheComponent{},
-		&config.ViperComponent{Path: "../config"},
+		// &config.ViperComponent{ConfKeyPrefix: "../config/dev"},
+		&config.ViperComponent{},
 		&logger.ZapComponent{},
 		&cache.RedisComponent{},
-		&servicemanage.ServiceManager{},
+		// &servicemanage.ServiceManager{},
 	).Init()
 }
 
@@ -92,4 +93,12 @@ func TestUtilIntersect(t *testing.T) {
 
 	fmt.Println(util.Intersect(new, old))
 	fmt.Println(util.Difference(old, new))
+}
+
+func TestConfGet(t *testing.T) {
+	initComponents()
+
+	// fmt.Println(config.Cfg.GetInt("proxy.http.read_timeout"))
+	// fmt.Println(config.Cfg.GetString("zap.err_log"))
+	fmt.Println(config.Cfg.GetString("base.server_pord"))
 }
