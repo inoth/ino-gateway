@@ -8,7 +8,6 @@ import (
 	"github/inoth/ino-gateway/util"
 	"strings"
 	"sync"
-	"time"
 
 	redis "github/inoth/ino-gateway/components/cache"
 
@@ -190,7 +189,7 @@ func changeRedisServiceList(action bool, service *model.ServiceInfo) {
 		if err != nil {
 			return
 		}
-		redis.Rdc.Expire(ctx, ServiceListCacheKey, time.Hour*72)
+		// redis.Rdc.Expire(ctx, ServiceListCacheKey, time.Hour*72)
 	} else {
 		redis.Rdc.SRem(ctx, ServiceListCacheKey, service.String())
 	}

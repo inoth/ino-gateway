@@ -30,9 +30,11 @@ func (hps *HttpProxyServer) Start() error {
 	})
 
 	r.Use(
-		httpproxymiddleware.HTTPAccessModeMiddleware(),
-		httpproxymiddleware.HTTPJwtAuthTokenMiddleware(),
-		httpproxymiddleware.HTTPReverseProxyMiddleware(),
+		httpproxymiddleware.HTTPAccessMode(),
+		httpproxymiddleware.HTTPFlowCount(),
+		httpproxymiddleware.HTTPFlowLimit(),
+		// httpproxymiddleware.HTTPJwtAuthToken(),
+		httpproxymiddleware.HTTPReverseProxy(),
 	)
 
 	httpSrvHandler = &http.Server{

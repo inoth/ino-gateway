@@ -12,7 +12,7 @@ import (
 */
 
 // 根据路由约定获取 /[service]/[version]
-func HTTPAccessModeMiddleware() gin.HandlerFunc {
+func HTTPAccessMode() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		service, err := servicemanage.ServiceManage.HTTPAccessMode(c)
 		if err != nil {

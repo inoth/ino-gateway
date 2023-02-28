@@ -14,6 +14,9 @@ type ServiceInfo struct {
 	Hosts       []ServerNode `json:"hosts"`
 	NeedAuth    bool         `json:"need_auth"`
 	NeedLicense bool         `json:"need_lic"` // default: false
+
+	MaxQps int64 `json:"max_qps"`
+	MaxQpd int64 `json:"max_qpd"`
 }
 
 type ServerNode struct {

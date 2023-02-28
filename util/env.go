@@ -5,7 +5,7 @@ import "os"
 const (
 	EnvDebug = "debug"
 	EnvDev   = "dev"
-	EnvProd  = "Prod"
+	EnvProd  = "prod"
 )
 
 func GetRunEnv() string {

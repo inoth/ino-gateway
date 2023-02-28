@@ -15,7 +15,7 @@ import (
 	获取客户端 jwt 信息，解析
 */
 
-func HTTPJwtAuthTokenMiddleware() gin.HandlerFunc {
+func HTTPJwtAuthToken() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		service, ok := c.Get("service")
 		if !ok {
@@ -47,6 +47,7 @@ func HTTPJwtAuthTokenMiddleware() gin.HandlerFunc {
 				c.Abort()
 				return
 			}
+			c.Set("user", customerInfo.UserInfo)
 			for key, val := range customerInfo.UserInfo {
 				c.Request.Header.Set(key, val.(string))
 			}

@@ -15,7 +15,7 @@ import (
 // 拿到服务注册信息
 // 负载均衡选择代理目标
 // 初始化反向代理
-func HTTPReverseProxyMiddleware() gin.HandlerFunc {
+func HTTPReverseProxy() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		service, ok := c.Get("service")
 		if !ok {
