@@ -38,13 +38,13 @@ func RequestOutLog(c *gin.Context) {
 	st, _ := c.Get("startExecTime")
 	startExecTime, _ := st.(time.Time)
 	resp := map[string]interface{}{
-		"trace_id":  traceId,
-		"uri":       c.Request.RequestURI,
-		"method":    c.Request.Method,
-		"args":      c.Request.PostForm,
-		"from":      c.ClientIP(),
-		"response":  response,
-		"proc_time": endExecTime.Sub(startExecTime).Seconds(),
+		"trace_id":     traceId,
+		"uri":          c.Request.RequestURI,
+		"method":       c.Request.Method,
+		"args":         c.Request.PostForm,
+		"from":         c.ClientIP(),
+		"response":     response,
+		"proc_time_ms": endExecTime.Sub(startExecTime).Milliseconds(),
 	}
 	logger.Zap.Info(fmt.Sprintf("%+v", resp))
 }
