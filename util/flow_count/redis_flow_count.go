@@ -8,16 +8,6 @@ import (
 	"time"
 )
 
-// // Pipelineを使ってループ
-// m := map[string]*redis.StringCmd{}
-// pipe := client.Pipeline()
-// for i := 0; i < 10000; i++ {
-// 	m["key"+strconv.Itoa(i)] = pipe.Get("key" + strconv.Itoa(i))
-// }
-// _, err := pipe.Exec()
-// if err != nil {
-// 	panic(err)
-// }
 const (
 	RedisFlowDayKey  = "_gateway_:flow_day_count"
 	RedisFlowHourKey = "_gateway_:flow_hour_count"
@@ -54,15 +44,6 @@ func NewRedisFlowCountService(appID string, interval time.Duration) *RedisFlowCo
 			currentTime := time.Now()
 			dayKey := reqCounter.GetDayKey(currentTime)
 			hourKey := reqCounter.GetHourKey(currentTime)
-			// if err := RedisConfPipline(func(c redis.Conn) {
-			// 	c.Send("INCRBY", dayKey, tickerCount)
-			// 	c.Send("EXPIRE", dayKey, 86400*2)
-			// 	c.Send("INCRBY", hourKey, tickerCount)
-			// 	c.Send("EXPIRE", hourKey, 86400*2)
-			// }); err != nil {
-			// 	fmt.Println("RedisConfPipline err",err)
-			// 	continue
-			// }
 			ctx := context.Background()
 			pip := cache.Rdc.Pipeline()
 			{
