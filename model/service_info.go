@@ -16,7 +16,6 @@ type ServiceInfo struct {
 	NeedLicense bool         `json:"need_lic"` // default: false
 
 	MaxQps int64 `json:"max_qps"`
-	MaxQpd int64 `json:"max_qpd"`
 }
 
 type ServerNode struct {

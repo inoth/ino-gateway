@@ -26,7 +26,7 @@ func HTTPFlowLimit() gin.HandlerFunc {
 		serviceInfo := service.(*model.ServiceInfo)
 
 		// 单个服务请求流量限制
-		if serviceInfo.MaxQpd > 0 {
+		if serviceInfo.MaxQps > 0 {
 			serviceLimiter, err := flowcount.FlowLimiterHandler.GetLimiter(flowcount.FlowTotalService, float64(serviceInfo.MaxQps))
 			if err != nil {
 				res.ResultErr(c, http.StatusBadGateway, err)
