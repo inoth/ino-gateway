@@ -3,7 +3,7 @@ package httpproxymiddleware
 import "github.com/gin-gonic/gin"
 
 /*
-	获取用户权限信息
+	用户角色权限过滤器
 */
 
 func HTTPJwtAuthRole() gin.HandlerFunc {
@@ -11,7 +11,9 @@ func HTTPJwtAuthRole() gin.HandlerFunc {
 		_, ok := c.Get("user")
 		if !ok {
 			c.Next()
+			return
 		}
 		// 处理用户相关权限事宜
+		c.Next()
 	}
 }

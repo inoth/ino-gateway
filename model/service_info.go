@@ -15,7 +15,8 @@ type ServiceInfo struct {
 	NeedAuth    bool         `json:"need_auth"`
 	NeedLicense bool         `json:"need_lic"` // default: false
 
-	MaxQps int64 `json:"max_qps"`
+	MaxQps     int64  `json:"max_qps"`
+	JwtSignKey string `json:"jwt_signkey"`
 }
 
 type ServerNode struct {

@@ -8,6 +8,7 @@ import (
 const (
 	FlowTotal        = "flow_total"
 	FlowTotalService = "flow_total_service:"
+	FlowTotalTenant  = "flow_total_tenant:"
 )
 
 var FlowCounterHandler *FlowCounter

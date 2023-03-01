@@ -13,6 +13,10 @@ import (
 
 /*
 	获取客户端 jwt 信息，解析
+	后续步骤：
+	租户服务请求计数统计
+	角色权限
+	租户license
 */
 
 func HTTPJwtAuthToken() gin.HandlerFunc {
@@ -41,7 +45,10 @@ func HTTPJwtAuthToken() gin.HandlerFunc {
 				c.Abort()
 				return
 			}
-			customerInfo, err := auth.ParseToken(token)
+			if len(serviceInfo.JwtSignKey) <= 0 {
+				serviceInfo.JwtSignKey = auth.DEFAULT_SIGNKEY
+			}
+			customerInfo, err := auth.ParseToken(serviceInfo.JwtSignKey, token)
 			if err != nil {
 				res.ResultErr(c, res.InvalidRequestErrorCode, err)
 				c.Abort()

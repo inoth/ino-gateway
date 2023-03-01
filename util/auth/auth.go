@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	SIGNKEY = "BA5ktbKaV47uOcQpnuUT76GvBRYpMdHX"
+	DEFAULT_SIGNKEY = "BA5ktbKaV47uOcQpnuUT76GvBRYpMdHX"
 )
 
 type CustomerInfo struct {
@@ -20,11 +20,15 @@ type CustomClaims struct {
 	CustomerInfo
 }
 
-func CreateToken(userInfo map[string]interface{}, expire ...int64) (string, error) {
-	key := []byte(SIGNKEY)
+func CreateToken(signKey string, userInfo map[string]interface{}, expire ...time.Duration) (string, error) {
+	key := []byte(signKey)
+	var exp time.Duration = 12
+	if len(expire) > 0 {
+		exp = expire[0]
+	}
 	c := CustomClaims{
 		jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 12)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * exp)),
 			Issuer:    userInfo["name"].(string),
 		},
 		CustomerInfo{
@@ -39,12 +43,12 @@ func CreateToken(userInfo map[string]interface{}, expire ...int64) (string, erro
 	return sign, nil
 }
 
-func ParseToken(tokenStr string) (*CustomerInfo, error) {
+func ParseToken(signKey, tokenStr string) (*CustomerInfo, error) {
 	token, err := jwt.ParseWithClaims(tokenStr, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(SIGNKEY), nil
+		return []byte(signKey), nil
 	})
 	if claims, ok := token.Claims.(*CustomClaims); ok && token.Valid {
 		return &claims.CustomerInfo, nil
