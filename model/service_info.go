@@ -30,7 +30,7 @@ func (si ServiceInfo) String() []byte {
 }
 
 func (si *ServiceInfo) GetHost() string {
-	return si.Hosts[rand.Intn(len(si.Hosts))].Host
+	return si.Hosts[rand.Int()%len(si.Hosts)].Host
 }
 
 func (si *ServiceInfo) AddNode(node ...ServerNode) bool {
