@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	RedisFlowDayKey  = "_github/inoth/ino-gateway_:flow_day_count"
-	RedisFlowHourKey = "_github/inoth/ino-gateway_:flow_hour_count"
+	RedisFlowDayKey  = "_gateway_:flow_day_count"
+	RedisFlowHourKey = "_gateway_:flow_hour_count"
 )
 
 type RedisFlowCountService struct {

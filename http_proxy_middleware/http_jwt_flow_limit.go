@@ -15,8 +15,8 @@ func HttpJwtFlowLimit() gin.HandlerFunc {
 		// 获取租户信息
 		user, ok := c.Get("user")
 		if !ok {
-			res.ResultErr(c, http.StatusBadGateway, errors.New("user not found"))
-			c.Abort()
+			// 不存在用户信息直接跳过
+			c.Next()
 			return
 		}
 		userInfo := user.(map[string]interface{})

@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	ServiceListCacheKey = "_github/inoth/ino-gateway_:servicelist"
+	ServiceListCacheKey = "_gateway_:servicelist"
 )
 
 var (

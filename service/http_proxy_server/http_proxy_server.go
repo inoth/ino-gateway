@@ -36,6 +36,7 @@ func (hps *HttpProxyServer) Start() error {
 		httpproxymiddleware.HTTPFlowLimit(),
 		httpproxymiddleware.HTTPJwtAuthToken(),
 		httpproxymiddleware.HttpJwtFlowCount(),
+		httpproxymiddleware.HttpJwtFlowLimit(),
 		httpproxymiddleware.HTTPReverseProxy(),
 	)
 
