@@ -2,17 +2,19 @@ package test
 
 import (
 	"fmt"
-	"github/inoth/ino-gateway/components/cache"
-	"github/inoth/ino-gateway/components/config"
-	"github/inoth/ino-gateway/components/local"
-	"github/inoth/ino-gateway/components/logger"
+
 	servicemanage "github/inoth/ino-gateway/components/service_manage"
 	"github/inoth/ino-gateway/model"
-	"github/inoth/ino-gateway/register"
 	"github/inoth/ino-gateway/util"
 	"log"
 	"os"
 	"testing"
+
+	"github.com/inoth/ino-toybox/components/cache"
+	"github.com/inoth/ino-toybox/components/config"
+	"github.com/inoth/ino-toybox/components/logger"
+	"github.com/inoth/ino-toybox/components/redis"
+	"github.com/inoth/ino-toybox/register"
 )
 
 var reg *register.Register
@@ -20,11 +22,11 @@ var reg *register.Register
 func initComponents() {
 	os.Setenv("GORUNEVN", "dev")
 	reg = register.NewRegister(
-		&local.CacheComponent{},
+		&cache.CacheComponent{},
 		// &config.ViperComponent{ConfKeyPrefix: "../config/dev"},
 		&config.ViperComponent{},
 		&logger.ZapComponent{},
-		&cache.RedisComponent{},
+		&redis.RedisComponent{},
 		// &servicemanage.ServiceManager{},
 	).Init()
 }

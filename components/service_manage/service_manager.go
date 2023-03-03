@@ -9,13 +9,12 @@ import (
 	"strings"
 	"sync"
 
-	redis "github/inoth/ino-gateway/components/cache"
-
 	"github.com/gin-gonic/gin"
+	"github.com/inoth/ino-toybox/components/redis"
 )
 
 const (
-	ServiceListCacheKey = "_gateway_:servicelist"
+	ServiceListCacheKey = "_github/inoth/ino-gateway_:servicelist"
 )
 
 var (

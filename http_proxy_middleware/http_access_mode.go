@@ -2,7 +2,8 @@ package httpproxymiddleware
 
 import (
 	servicemanage "github/inoth/ino-gateway/components/service_manage"
-	"github/inoth/ino-gateway/res"
+
+	"github.com/inoth/ino-toybox/res"
 
 	"github.com/gin-gonic/gin"
 )

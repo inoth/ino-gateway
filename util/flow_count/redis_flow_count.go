@@ -3,14 +3,15 @@ package flowcount
 import (
 	"context"
 	"fmt"
-	"github/inoth/ino-gateway/components/cache"
 	"sync/atomic"
 	"time"
+
+	"github.com/inoth/ino-toybox/components/redis"
 )
 
 const (
-	RedisFlowDayKey  = "_gateway_:flow_day_count"
-	RedisFlowHourKey = "_gateway_:flow_hour_count"
+	RedisFlowDayKey  = "_github/inoth/ino-gateway_:flow_day_count"
+	RedisFlowHourKey = "_github/inoth/ino-gateway_:flow_hour_count"
 )
 
 type RedisFlowCountService struct {
@@ -44,8 +45,9 @@ func NewRedisFlowCountService(appID string, interval time.Duration) *RedisFlowCo
 			currentTime := time.Now()
 			dayKey := reqCounter.GetDayKey(currentTime)
 			hourKey := reqCounter.GetHourKey(currentTime)
+
 			ctx := context.Background()
-			pip := cache.Rdc.Pipeline()
+			pip := redis.Rdc.Pipeline()
 			{
 				pip.IncrBy(ctx, dayKey, tickerCount)
 				pip.Expire(ctx, dayKey, time.Hour*48)
@@ -89,11 +91,11 @@ func (o *RedisFlowCountService) GetHourKey(t time.Time) string {
 }
 
 func (o *RedisFlowCountService) GetHourData(t time.Time) (int64, error) {
-	return cache.Rdc.Get(context.Background(), o.GetHourKey(t)).Int64()
+	return redis.Rdc.Get(context.Background(), o.GetHourKey(t)).Int64()
 }
 
 func (o *RedisFlowCountService) GetDayData(t time.Time) (int64, error) {
-	return cache.Rdc.Get(context.Background(), o.GetDayKey(t)).Int64()
+	return redis.Rdc.Get(context.Background(), o.GetDayKey(t)).Int64()
 }
 
 //原子增加

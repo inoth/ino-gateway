@@ -3,17 +3,19 @@ package register
 import (
 	"context"
 	"fmt"
-	"github/inoth/ino-gateway/components"
-	"github/inoth/ino-gateway/service"
+
 	"os"
 	"sync"
+
+	"github.com/inoth/ino-toybox/components"
+	"github.com/inoth/ino-toybox/services"
 )
 
 var initOnce sync.Once
 
 type Register struct {
 	cmps []components.Components
-	svcs []service.Service
+	svcs []services.Service
 }
 
 func NewRegister(cmps ...components.Components) *Register {
@@ -31,10 +33,10 @@ func (reg *Register) Init() *Register {
 	return reg
 }
 
-func (reg *Register) SubStart(svcs ...service.Service) *Register {
+func (reg *Register) SubStart(svcs ...services.Service) *Register {
 	reg.svcs = svcs
 	for _, svc := range reg.svcs {
-		go func(ctx context.Context, service service.Service) {
+		go func(ctx context.Context, service services.Service) {
 			defer func() {
 				if exception := recover(); exception != nil {
 					if err, ok := exception.(error); ok {
@@ -52,7 +54,7 @@ func (reg *Register) SubStart(svcs ...service.Service) *Register {
 	return reg
 }
 
-func (reg *Register) Start(svcs service.Service) {
+func (reg *Register) Start(svcs services.Service) {
 	must(svcs.Start())
 }
 

@@ -8,9 +8,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github/inoth/ino-gateway/components/config"
-	"github/inoth/ino-gateway/components/logger"
 	httpproxymiddleware "github/inoth/ino-gateway/http_proxy_middleware"
+
+	"github.com/inoth/ino-toybox/components/config"
+	"github.com/inoth/ino-toybox/components/logger"
 )
 
 var (
@@ -33,7 +34,8 @@ func (hps *HttpProxyServer) Start() error {
 		httpproxymiddleware.HTTPAccessMode(),
 		httpproxymiddleware.HTTPFlowCount(),
 		httpproxymiddleware.HTTPFlowLimit(),
-		// httpproxymiddleware.HTTPJwtAuthToken(),
+		httpproxymiddleware.HTTPJwtAuthToken(),
+		httpproxymiddleware.HttpJwtFlowCount(),
 		httpproxymiddleware.HTTPReverseProxy(),
 	)
 

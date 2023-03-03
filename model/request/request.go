@@ -2,7 +2,8 @@ package request
 
 import (
 	"github/inoth/ino-gateway/model"
-	"github/inoth/ino-gateway/res"
+
+	"github.com/inoth/ino-toybox/res"
 
 	"github.com/gin-gonic/gin"
 )
@@ -35,12 +36,13 @@ func RequestXMLParamHandler[T interface{}](c *gin.Context) (T, bool) {
 }
 
 type ServiceNodeRequests struct {
-	ServiceKey  string             `json:"server_key"`
-	Version     string             `json:"version"`
-	Desc        string             `json:"desc"`
-	Hosts       []model.ServerNode `json:"hosts"`
-	NeedAuth    bool               `json:"need_auth"`
-	NeedLicense bool               `json:"need_lic"` // default: false
+	ServiceKey string `json:"service_key"`
+	Version    string `json:"version"`
+	Desc       string `json:"desc"`
+	// Host        model.ServerNode `json:"host"`
+	Host        string `json:"host"`
+	NeedAuth    bool   `json:"need_auth"`
+	NeedLicense bool   `json:"need_lic"` // default: false
 }
 
 type ServiceNodeRemoveRequest struct {

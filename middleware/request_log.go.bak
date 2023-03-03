@@ -3,12 +3,12 @@ package middleware
 import (
 	"bytes"
 	"fmt"
-	"github/inoth/ino-gateway/components/logger"
 	"github/inoth/ino-gateway/util"
 	"io"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/inoth/ino-toybox/components/logger"
 )
 
 func RequestInLog(c *gin.Context) {

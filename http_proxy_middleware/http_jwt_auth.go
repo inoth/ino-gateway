@@ -3,10 +3,12 @@ package httpproxymiddleware
 import (
 	"errors"
 	"github/inoth/ino-gateway/model"
-	"github/inoth/ino-gateway/res"
-	"github/inoth/ino-gateway/util/auth"
 	"net/http"
 	"strings"
+
+	jwtauth "github.com/inoth/ino-toybox/utils/jwt_auth"
+
+	"github.com/inoth/ino-toybox/res"
 
 	"github.com/gin-gonic/gin"
 )
@@ -46,9 +48,9 @@ func HTTPJwtAuthToken() gin.HandlerFunc {
 				return
 			}
 			if len(serviceInfo.JwtSignKey) <= 0 {
-				serviceInfo.JwtSignKey = auth.DEFAULT_SIGNKEY
+				serviceInfo.JwtSignKey = jwtauth.DEFAULT_SIGNKEY
 			}
-			customerInfo, err := auth.ParseToken(serviceInfo.JwtSignKey, token)
+			customerInfo, err := jwtauth.ParseToken(serviceInfo.JwtSignKey, token)
 			if err != nil {
 				res.ResultErr(c, res.InvalidRequestErrorCode, err)
 				c.Abort()

@@ -3,10 +3,11 @@ package httpproxymiddleware
 import (
 	"errors"
 	"github/inoth/ino-gateway/model"
-	"github/inoth/ino-gateway/res"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+
+	"github.com/inoth/ino-toybox/res"
 
 	"github.com/gin-gonic/gin"
 )
@@ -27,7 +28,7 @@ func HTTPReverseProxy() gin.HandlerFunc {
 
 		proxy, err := newProxy(serviceInfo.GetHost())
 		if err != nil {
-			res.ResultErr(c, http.StatusBadGateway, errors.New("bad gateway"))
+			res.ResultErr(c, http.StatusBadGateway, errors.New("bad status bad gateway"))
 			c.Abort()
 			return
 		}
@@ -52,11 +53,29 @@ func newProxy(targetHost string) (*httputil.ReverseProxy, error) {
 		modifyRequest(req)
 	}
 
-	// proxy.ModifyResponse = modifyResponse()
-	// proxy.ErrorHandler = errorHandler()
+	// proxy.ModifyResponse = modifyResponse
+	// proxy.ErrorHandler = errorHandler
 	return proxy, nil
 }
 
 func modifyRequest(req *http.Request) {
 	req.Header.Set("X-Proxy", "Cmdb-Reverse-Proxy")
 }
+
+// func modifyResponse(resp *http.Response) error {
+// 	// 获取响应的 body
+// 	body, err := io.ReadAll(resp.Body)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	// 修改响应的 body
+// 	newBody := []byte("Modified Response: " + string(body))
+// 	resp.Body = io.NopCloser(bytes.NewBuffer(newBody))
+// 	resp.ContentLength = int64(len(newBody))
+// 	resp.Header.Set("Content-Length", fmt.Sprint(len(newBody)))
+
+//	// TODO:插入缓存的数据？
+
+// 	return nil
+// }

@@ -1,13 +1,8 @@
 package main
 
 import (
-	"github/inoth/ino-gateway/components/cache"
-	"github/inoth/ino-gateway/components/config"
-	"github/inoth/ino-gateway/components/local"
-	"github/inoth/ino-gateway/components/logger"
 	servicemanage "github/inoth/ino-gateway/components/service_manage"
-	"github/inoth/ino-gateway/middleware"
-	"github/inoth/ino-gateway/register"
+
 	httpproxyserver "github/inoth/ino-gateway/service/http_proxy_server"
 	proxyconfserver "github/inoth/ino-gateway/service/proxy_conf_server"
 	"os"
@@ -16,6 +11,13 @@ import (
 	"syscall"
 
 	"github.com/gin-gonic/gin"
+
+	"github.com/inoth/ino-toybox/components/cache"
+	"github.com/inoth/ino-toybox/components/config"
+	"github.com/inoth/ino-toybox/components/logger"
+	"github.com/inoth/ino-toybox/components/redis"
+	"github.com/inoth/ino-toybox/middleware"
+	"github.com/inoth/ino-toybox/register"
 )
 
 type UserInfo struct {
@@ -24,10 +26,10 @@ type UserInfo struct {
 
 func main() {
 	reg := register.NewRegister(
-		&local.CacheComponent{},
+		&cache.CacheComponent{},
 		&config.ViperComponent{},
 		&logger.ZapComponent{},
-		&cache.RedisComponent{},
+		&redis.RedisComponent{},
 		&servicemanage.ServiceManager{},
 	).Init().SubStart(
 		&proxyconfserver.HttpProxyServer{}, // 网关配置接口服务
@@ -35,6 +37,7 @@ func main() {
 			Middlewares: []gin.HandlerFunc{
 				middleware.Recovery(),
 				middleware.RequestLog(),
+				middleware.Cors(),
 			}}, // 代理服务
 	)
 

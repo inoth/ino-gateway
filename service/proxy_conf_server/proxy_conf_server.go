@@ -2,12 +2,14 @@ package proxyconfserver
 
 import (
 	"context"
-	"github/inoth/ino-gateway/components/logger"
 	"github/inoth/ino-gateway/model"
 	"github/inoth/ino-gateway/model/request"
-	"github/inoth/ino-gateway/res"
 	"net/http"
 	"time"
+
+	"github.com/inoth/ino-toybox/components/config"
+	"github.com/inoth/ino-toybox/components/logger"
+	"github.com/inoth/ino-toybox/res"
 
 	servicemanage "github/inoth/ino-gateway/components/service_manage"
 
@@ -36,8 +38,11 @@ func (hps *HttpProxyServer) Start() error {
 	}
 
 	ProxySrvHandler = &http.Server{
-		Addr:    ":8080",
-		Handler: r,
+		Addr:           ":9001",
+		Handler:        r,
+		ReadTimeout:    time.Duration(config.Cfg.GetInt("proxy.http.read_timeout")) * time.Second,
+		WriteTimeout:   time.Duration(config.Cfg.GetInt("proxy.http.write_timeout")) * time.Second,
+		MaxHeaderBytes: 1 << uint(config.Cfg.GetInt("proxy.http.max_header_bytes")),
 	}
 
 	if err := ProxySrvHandler.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -57,18 +62,23 @@ func (hps *HttpProxyServer) Stop() {
 
 // 添加服务节点
 func addProxyConfig(c *gin.Context) {
-	req, ok := request.RequestJsonParamHandler[request.ServiceNodeRequests](c)
+	req, ok := request.RequestJsonParamHandler[[]request.ServiceNodeRequests](c)
 	if !ok {
 		return
 	}
-	err := servicemanage.ServiceManage.AppendService(&model.ServiceInfo{
-		ServiceKey:  req.ServiceKey,
-		Version:     req.Version,
-		Desc:        req.Desc,
-		Hosts:       req.Hosts,
-		NeedAuth:    req.NeedAuth,
-		NeedLicense: req.NeedLicense,
-	})
+	adds := make([]*model.ServiceInfo, 0, len(req))
+	for _, val := range req {
+		tmp := &model.ServiceInfo{
+			ServiceKey:  val.ServiceKey,
+			Version:     val.Version,
+			Desc:        val.Desc,
+			NeedAuth:    val.NeedAuth,
+			NeedLicense: val.NeedLicense,
+		}
+		tmp.Hosts = append(tmp.Hosts, model.ServerNode{Host: val.Host})
+		adds = append(adds, tmp)
+	}
+	err := servicemanage.ServiceManage.AppendService(adds...)
 	if err != nil {
 		res.ResultErr(c, res.InvalidRequestErrorCode, err)
 		return

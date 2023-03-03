@@ -3,7 +3,7 @@ package test
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"math/rand"
 	"os"
 	"strings"
 	"testing"
@@ -28,7 +28,7 @@ func TestLoadConfigByViper(t *testing.T) {
 	}
 	for _, f0 := range fileList {
 		if !f0.IsDir() {
-			bts, err := ioutil.ReadFile(ConfEnvPath + "/" + f0.Name())
+			bts, err := os.ReadFile(ConfEnvPath + "/" + f0.Name())
 			if err != nil {
 				fmt.Println(err.Error())
 				return
@@ -48,4 +48,12 @@ func TestLoadConfigByViper(t *testing.T) {
 	fmt.Printf("\n%+v\n", ViperConfMap["base"].GetString("server_pord"))
 
 	t.Log("ok")
+}
+
+func TestRandInts(t *testing.T) {
+	list := []string{"111", "222", "111", "222", "111", "222", "111", "222"}
+	fmt.Println(rand.Int())
+	for i := 0; i < 10; i++ {
+		fmt.Printf("%v\n", rand.Int()%len(list))
+	}
 }

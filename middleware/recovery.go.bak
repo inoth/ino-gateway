@@ -3,11 +3,11 @@ package middleware
 import (
 	"errors"
 	"fmt"
-	"github/inoth/ino-gateway/res"
 	"github/inoth/ino-gateway/util"
 	"runtime/debug"
 
 	"github.com/gin-gonic/gin"
+	"github.com/inoth/ino-toybox/res"
 )
 
 func Recovery() gin.HandlerFunc {

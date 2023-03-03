@@ -2,20 +2,21 @@ package httpproxymiddleware
 
 import (
 	"errors"
+	"fmt"
 	flowcount "github/inoth/ino-gateway/util/flow_count"
 	"net/http"
 
-	"github.com/inoth/ino-toybox/res"
-
 	"github.com/gin-gonic/gin"
+	"github.com/inoth/ino-toybox/res"
 )
 
-func HttpJwtFlowCount() gin.HandlerFunc {
+func HttpJwtFlowLimit() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// 获取租户信息
 		user, ok := c.Get("user")
 		if !ok {
-			// 不存在用户信息直接跳过
-			c.Next()
+			res.ResultErr(c, http.StatusBadGateway, errors.New("user not found"))
+			c.Abort()
 			return
 		}
 		userInfo := user.(map[string]interface{})
@@ -28,15 +29,21 @@ func HttpJwtFlowCount() gin.HandlerFunc {
 			return
 		}
 		tenantId = t.(string)
-		// 租户计数器
+
+		// 获取租户计数器
 		tenantCount, err := flowcount.FlowCounterHandler.GetCounter(flowcount.FlowTotalTenant + tenantId)
 		if err != nil {
-			res.ResultErr(c, http.StatusBadRequest, err)
+			res.ResultErr(c, http.StatusForbidden, err)
 			c.Abort()
 			return
 		}
-		tenantCount.Increase()
 
+		if tenantCount.TotalCount > int64(100000) {
+			res.ResultErr(c, http.StatusForbidden, fmt.Errorf("租户日请求量限流 limit:%v current:%v", 100000, tenantCount.TotalCount))
+			c.Abort()
+			return
+		}
 		c.Next()
+		return
 	}
 }
