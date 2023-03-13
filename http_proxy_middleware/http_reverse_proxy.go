@@ -2,12 +2,17 @@ package httpproxymiddleware
 
 import (
 	"errors"
-	"github/inoth/ino-gateway/model"
+	"fmt"
+	servicemanage "github/inoth/gateway/components/service_manage"
+	"github/inoth/gateway/model"
+	flowcount "github/inoth/gateway/util/flow_count"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"time"
 
-	"github.com/inoth/ino-toybox/res"
+	"github.com/inoth/toybox/components/config"
+	"github.com/inoth/toybox/res"
 
 	"github.com/gin-gonic/gin"
 )
@@ -60,6 +65,24 @@ func newProxy(targetHost string) (*httputil.ReverseProxy, error) {
 
 func modifyRequest(req *http.Request) {
 	req.Header.Set("X-Proxy", "Cmdb-Reverse-Proxy")
+}
+
+// 错误端口计数器
+func errRequestFlowCount(serverName, version, host string) error {
+	hostCount, err := flowcount.FlowCounterHandler.GetCounter(flowcount.FlowTotalErrHost + host)
+	if err != nil {
+		return err
+	}
+	// 每次错误新增一次记录
+	hostCount.Increase()
+	// TODO:配置文件中设定每日允许最大错误量
+	count, _ := hostCount.GetHourData(time.Now())
+	if count > int64(config.Cfg.GetInt("proxy.error_von_hour")) {
+		// 删除当前服务端口, 等待服务重启后重新注册
+		fmt.Printf("服务：%v/%v[%v]累计错误数超出设定阈值:%d\n", serverName, version, host, count)
+		return servicemanage.ServiceManage.DelService(serverName, version, model.ServerNode{Host: host})
+	}
+	return nil
 }
 
 // func modifyResponse(resp *http.Response) error {

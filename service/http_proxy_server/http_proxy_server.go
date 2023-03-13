@@ -8,10 +8,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	httpproxymiddleware "github/inoth/ino-gateway/http_proxy_middleware"
+	httpproxymiddleware "github/inoth/gateway/http_proxy_middleware"
 
-	"github.com/inoth/ino-toybox/components/config"
-	"github.com/inoth/ino-toybox/components/logger"
+	"github.com/inoth/toybox/components/config"
+	"github.com/inoth/toybox/components/logger"
 )
 
 var (
@@ -49,7 +49,7 @@ func (hps *HttpProxyServer) Start() error {
 	}
 
 	if err := httpSrvHandler.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		logger.Zap.Error(err.Error())
+		logger.Log.Err(err.Error())
 		return err
 	}
 	return nil
@@ -59,6 +59,6 @@ func (hps *HttpProxyServer) Stop() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	if err := httpSrvHandler.Shutdown(ctx); err != nil {
-		logger.Zap.Error(err.Error())
+		logger.Log.Err(err.Error())
 	}
 }

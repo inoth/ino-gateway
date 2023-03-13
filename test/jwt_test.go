@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	jwtauth "github.com/inoth/ino-toybox/utils/jwt_auth"
+	jwtauth "github.com/inoth/toybox/utils/jwt_auth"
 )
 
 func TestGenJwtStr(t *testing.T) {

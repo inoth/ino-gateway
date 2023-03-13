@@ -4,13 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github/inoth/ino-gateway/model"
-	"github/inoth/ino-gateway/util"
+	"github/inoth/gateway/model"
+	"github/inoth/gateway/util"
 	"strings"
 	"sync"
 
 	"github.com/gin-gonic/gin"
-	"github.com/inoth/ino-toybox/components/redis"
+	"github.com/inoth/toybox/components/redis"
 )
 
 const (

@@ -9,6 +9,7 @@ const (
 	FlowTotal        = "flow_total"
 	FlowTotalService = "flow_total_service:"
 	FlowTotalTenant  = "flow_total_tenant:"
+	FlowTotalErrHost = "flow_total_err_host:"
 )
 
 var FlowCounterHandler *FlowCounter

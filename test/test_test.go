@@ -3,18 +3,18 @@ package test
 import (
 	"fmt"
 
-	servicemanage "github/inoth/ino-gateway/components/service_manage"
-	"github/inoth/ino-gateway/model"
-	"github/inoth/ino-gateway/util"
+	servicemanage "github/inoth/gateway/components/service_manage"
+	"github/inoth/gateway/model"
+	"github/inoth/gateway/util"
 	"log"
 	"os"
 	"testing"
 
-	"github.com/inoth/ino-toybox/components/cache"
-	"github.com/inoth/ino-toybox/components/config"
-	"github.com/inoth/ino-toybox/components/logger"
-	"github.com/inoth/ino-toybox/components/redis"
-	"github.com/inoth/ino-toybox/register"
+	"github.com/inoth/toybox/components/cache"
+	"github.com/inoth/toybox/components/config"
+	logzap "github.com/inoth/toybox/components/logger/log_zap"
+	"github.com/inoth/toybox/components/redis"
+	"github.com/inoth/toybox/register"
 )
 
 var reg *register.Register
@@ -25,7 +25,7 @@ func initComponents() {
 		&cache.CacheComponent{},
 		// &config.ViperComponent{ConfKeyPrefix: "../config/dev"},
 		&config.ViperComponent{},
-		&logger.ZapComponent{},
+		&logzap.ZapComponent{},
 		&redis.RedisComponent{},
 		// &servicemanage.ServiceManager{},
 	).Init()

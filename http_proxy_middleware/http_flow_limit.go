@@ -3,11 +3,11 @@ package httpproxymiddleware
 import (
 	"errors"
 	"fmt"
-	"github/inoth/ino-gateway/model"
-	flowcount "github/inoth/ino-gateway/util/flow_count"
+	"github/inoth/gateway/model"
+	flowcount "github/inoth/gateway/util/flow_count"
 	"net/http"
 
-	"github.com/inoth/ino-toybox/res"
+	"github.com/inoth/toybox/res"
 
 	"github.com/gin-gonic/gin"
 )

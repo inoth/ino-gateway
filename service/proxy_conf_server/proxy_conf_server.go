@@ -2,16 +2,17 @@ package proxyconfserver
 
 import (
 	"context"
-	"github/inoth/ino-gateway/model"
-	"github/inoth/ino-gateway/model/request"
+	"github/inoth/gateway/model"
+	"github/inoth/gateway/model/request"
 	"net/http"
 	"time"
 
-	"github.com/inoth/ino-toybox/components/config"
-	"github.com/inoth/ino-toybox/components/logger"
-	"github.com/inoth/ino-toybox/res"
+	"github.com/inoth/toybox/components/config"
+	"github.com/inoth/toybox/components/logger"
+	"github.com/inoth/toybox/middleware"
+	"github.com/inoth/toybox/res"
 
-	servicemanage "github/inoth/ino-gateway/components/service_manage"
+	servicemanage "github/inoth/gateway/components/service_manage"
 
 	"github.com/gin-gonic/gin"
 )
@@ -46,7 +47,7 @@ func (hps *HttpProxyServer) Start() error {
 	}
 
 	if err := ProxySrvHandler.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		logger.Zap.Error(err.Error())
+		logger.Log.Err(err.Error())
 		return err
 	}
 	return nil
@@ -56,13 +57,13 @@ func (hps *HttpProxyServer) Stop() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	if err := ProxySrvHandler.Shutdown(ctx); err != nil {
-		logger.Zap.Error(err.Error())
+		logger.Log.Err(err.Error())
 	}
 }
 
 // 添加服务节点
 func addProxyConfig(c *gin.Context) {
-	req, ok := request.RequestJsonParamHandler[[]request.ServiceNodeRequests](c)
+	req, ok := middleware.RequestJsonParamHandler[[]request.ServiceNodeRequests](c)
 	if !ok {
 		return
 	}
@@ -88,7 +89,7 @@ func addProxyConfig(c *gin.Context) {
 
 // 删除节点
 func removeProxyConfig(c *gin.Context) {
-	req, ok := request.RequestJsonParamHandler[request.ServiceNodeRemoveRequest](c)
+	req, ok := middleware.RequestJsonParamHandler[request.ServiceNodeRemoveRequest](c)
 	if !ok {
 		return
 	}

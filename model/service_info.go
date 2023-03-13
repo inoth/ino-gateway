@@ -2,7 +2,7 @@ package model
 
 import (
 	"encoding/json"
-	"github/inoth/ino-gateway/util"
+	"github/inoth/gateway/util"
 	"math/rand"
 )
 

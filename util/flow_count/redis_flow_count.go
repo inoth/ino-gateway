@@ -6,7 +6,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/inoth/ino-toybox/components/redis"
+	"github.com/inoth/toybox/components/redis"
 )
 
 const (

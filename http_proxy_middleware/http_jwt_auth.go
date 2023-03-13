@@ -2,13 +2,14 @@ package httpproxymiddleware
 
 import (
 	"errors"
-	"github/inoth/ino-gateway/model"
+	"github/inoth/gateway/model"
 	"net/http"
+	"regexp"
 	"strings"
 
-	jwtauth "github.com/inoth/ino-toybox/utils/jwt_auth"
+	jwtauth "github.com/inoth/toybox/utils/jwt_auth"
 
-	"github.com/inoth/ino-toybox/res"
+	"github.com/inoth/toybox/res"
 
 	"github.com/gin-gonic/gin"
 )
@@ -32,6 +33,14 @@ func HTTPJwtAuthToken() gin.HandlerFunc {
 		serviceInfo := service.(*model.ServiceInfo)
 		// 该服务是否需要登录信息
 		if serviceInfo.NeedAuth {
+
+			// 判断是否为login相关接口
+			r := regexp.MustCompile("login|Login|registry")
+			if r.MatchString(c.Request.URL.Path) {
+				c.Next()
+				return
+			}
+
 			token := strings.ReplaceAll(c.GetHeader("Authorization"), "Bearer ", "")
 			if len(token) <= 0 {
 				var err error
